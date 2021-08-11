@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>WhatsApp Chat Analyzer</title>
+        <link rel="stylesheet" href="styles.css">
+        <script src="https://cdn.jsdelivr.net/npm/whatsapp-chat-parser/dist/whatsapp-chat-parser.min.js"></script>
+        <script src="chatanalyzer.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <h1>WhatsApp Chat Analyzer</h1>
+        <h3>Supply a chat log:</h3>
+        <input type="file" id="logInput" accept="text/plain">
+        <button onclick="buttonPressed()" type="button">Process</button>
+        <br>
+        <button onclick="copyToClipboard()" style="display: none;" id="copy" type="button">Copy raw JSON to clipboard</button>
+        <p id="output" class="text-format"></p>
+    </body>
+</html>
