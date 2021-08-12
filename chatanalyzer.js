@@ -2,11 +2,31 @@ function copyToClipboard() {
     navigator.clipboard.writeText(document.getElementById("output").innerText);
 }
 
+function downloadCsv(name, headers, data) {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += headers.join(",") + "\r\n";
+    for (let i in data) {
+        let row = [];
+        for (let j in headers) {
+            row.push(data[i][headers[j]]);
+        }
+        csvContent += row.join(",") + "\r\n";
+    }
+    saveAs(csvContent, name + ".csv");
+}
+
 function appendTable(name, headers, data) {
     let h3 = document.createElement("h3");
     let h3Text = document.createTextNode(name);
     h3.appendChild(h3Text);
     document.body.appendChild(h3);
+    let exportBtn = document.createElement("button");
+    exportBtn.onclick = () => {
+        downloadCsv(name, headers, data);
+    };
+    let buttonText = document.createTextNode("Export CSV");
+    exportBtn.appendChild(buttonText);
+    document.body.appendChild(exportBtn);
     let table = document.createElement("table");
     let header = document.createElement("tr");
     for (let h in headers) {
@@ -29,9 +49,13 @@ function appendTable(name, headers, data) {
     document.body.appendChild(table);
 }
 
-function displayData(data) {
+function displayData(data, messages) {
     document.getElementById("output").innerText = JSON.stringify(data, null, 2);
     document.getElementById("copy").style.display = "inline-block";
+    document.getElementById("chatExport").style.display = "inline-block";
+    document.getElementById("chatExport").onclick = () => {
+        downloadCsv("log", ["author", "date", "chat", "message"], messages);
+    }
     appendTable("Average messages: ",
                 ["Month", "aveMessage", "aveMessageP50", "aveMessageP75"],
                 data.months.map((m) => Object.assign({}, {"Month": m[0]}, m[1])));
@@ -136,7 +160,7 @@ function process(messages) {
     for (let i in monthsList) {
         monthArray.push([monthsList[i], months[monthsList[i]]]);
     }
-    displayData({months: monthArray, users: userArray});
+    displayData({months: monthArray, users: userArray}, messages);
 }
 
 function getMessagesFromFile(file, then) {
@@ -163,8 +187,9 @@ function buttonPressed() {
         let file = files[i];
         if (typeof(file) === "object") {
             getMessagesFromFile(file, (messageList) => {
+                let chat = messageList[0].message.includes("WhatsApp") ? messageList[0].author : file.name;
                 messages = messages.concat(messageList.map((m) => {
-                    m.chat = i;
+                    m.chat = chat;
                     return m;
                 }));
                 finished++;
