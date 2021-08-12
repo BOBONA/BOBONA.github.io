@@ -3,7 +3,6 @@ function copyToClipboard() {
 }
 
 function appendTable(name, headers, data) {
-    console.log(data);
     let h3 = document.createElement("h3");
     let h3Text = document.createTextNode(name);
     h3.appendChild(h3Text);
@@ -33,16 +32,16 @@ function appendTable(name, headers, data) {
 function displayData(data) {
     document.getElementById("output").innerText = JSON.stringify(data, null, 2);
     document.getElementById("copy").style.display = "inline-block";
-    appendTable("Average message counts per user: ",
+    appendTable("Average messages: ",
                 ["Month", "aveMessage", "aveMessageP50", "aveMessageP75"],
                 data.months.map((m) => Object.assign({}, {"Month": m[0]}, m[1])));
     appendTable("Message count per user: ",
                 ["User"].concat(Object.keys(data.users[0][1].monthlyMessageCount)),
                 data.users.map((u) => Object.assign({}, {"User": u[0]}, u[1].monthlyMessageCount)));
-    appendTable("Average contact counts per month: ",
+    appendTable("Average touch points: ",
                 ["Month", "aveContact", "aveContactP50", "aveContactP75"],
                 data.months.map((m) => Object.assign({}, {"Month": m[0]}, m[1])));
-    appendTable("Contact count per user: ",
+    appendTable("Touch points per user: ",
                 ["User"].concat(Object.keys(data.users[0][1].monthlyContactCount)),
                 data.users.map((u) => Object.assign({}, {"User": u[0]}, u[1].monthlyContactCount)));
 }
@@ -107,7 +106,7 @@ function process(messages) {
         if (month in users[message.author].monthlyMessageCount) {
             users[message.author].monthlyMessageCount[month]++;
             months[month].aveMessage++;
-            let day = getDay(message.date);
+            let day = getDay(message.date) + "//" + message.chat;
             if (day in users[message.author].messageDays) {
                 users[message.author].messageDays[day]++;
             } else {
@@ -140,15 +139,13 @@ function process(messages) {
     displayData({months: monthArray, users: userArray});
 }
 
-function read(file) {
+function getMessagesFromFile(file, then) {
     let reader = new FileReader();
     reader.readAsText(file);
     reader.onload = (event) => {
         whatsappChatParser
             .parseString(event.target.result)
-            .then(messages => {
-                process(messages);
-            })
+            .then(then)
             .catch(err => {
                 console.log(err);
             });
@@ -159,8 +156,22 @@ function read(file) {
 }
 
 function buttonPressed() {
-    let file = document.getElementById("logInput").files[0];
-    if (file) {
-        read(file);
+    let files = document.getElementById("logInput").files;
+    let messages = [];
+    let finished = 0;
+    for (let i in files) {
+        let file = files[i];
+        if (typeof(file) === "object") {
+            getMessagesFromFile(file, (messageList) => {
+                messages = messages.concat(messageList.map((m) => {
+                    m.chat = i;
+                    return m;
+                }));
+                finished++;
+                if (finished === files.length) {
+                    process(messages);
+                }
+            });
+        }
     }
 }
