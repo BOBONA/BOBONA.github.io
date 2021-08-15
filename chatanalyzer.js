@@ -1,32 +1,34 @@
 function copyToClipboard() {
-    navigator.clipboard.writeText(document.getElementById("output").innerText);
+    navigator.clipboard.writeText(document.getElementById("raw").innerText);
 }
 
 function downloadCsv(name, headers, data) {
-    let csvContent = "data:text/csv;charset=utf-8,";
+    let csvContent = "";
     csvContent += headers.join(",") + "\r\n";
     for (let i in data) {
         let row = [];
         for (let j in headers) {
-            row.push(data[i][headers[j]]);
+            row.push('"' + String(data[i][headers[j]]).replaceAll(/"/g, '""') + '"');
         }
         csvContent += row.join(",") + "\r\n";
     }
-    saveAs(csvContent, name + ".csv");
+    var blob = new Blob([csvContent], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, name + ".csv");
 }
 
 function appendTable(name, headers, data) {
     let h3 = document.createElement("h3");
     let h3Text = document.createTextNode(name);
+    let output = document.getElementById("output");
     h3.appendChild(h3Text);
-    document.body.appendChild(h3);
+    output.appendChild(h3);
     let exportBtn = document.createElement("button");
     exportBtn.onclick = () => {
         downloadCsv(name, headers, data);
     };
     let buttonText = document.createTextNode("Export CSV");
     exportBtn.appendChild(buttonText);
-    document.body.appendChild(exportBtn);
+    output.appendChild(exportBtn);
     let table = document.createElement("table");
     let header = document.createElement("tr");
     for (let h in headers) {
@@ -46,15 +48,19 @@ function appendTable(name, headers, data) {
         }
         table.append(row);
     }
-    document.body.appendChild(table);
+    output.appendChild(table);
 }
 
 function displayData(data, messages) {
-    document.getElementById("output").innerText = JSON.stringify(data, null, 2);
+    document.getElementById("raw").innerText = JSON.stringify(data, null, 2);
     document.getElementById("copy").style.display = "inline-block";
     document.getElementById("chatExport").style.display = "inline-block";
     document.getElementById("chatExport").onclick = () => {
         downloadCsv("log", ["author", "date", "chat", "message"], messages);
+    }
+    let output = document.getElementById("output");
+    while (output.firstChild) {
+        output.removeChild(output.lastChild);
     }
     appendTable("Average messages: ",
                 ["Month", "aveMessage", "aveMessageP50", "aveMessageP75"],
@@ -99,7 +105,7 @@ function getDay(date) {
 }
 
 function process(messages) {
-    let monthsList = getLastMonths(12);
+    let monthsList = getLastMonths(document.getElementById("months").value);
     let monthlyCountObject = {};
     let months = {}
     for (let i in monthsList) {
@@ -163,40 +169,130 @@ function process(messages) {
     displayData({months: monthArray, users: userArray}, messages);
 }
 
-function getMessagesFromFile(file, then) {
+function readTextFromFile(file, then) {
     let reader = new FileReader();
     reader.readAsText(file);
     reader.onload = (event) => {
-        whatsappChatParser
-            .parseString(event.target.result)
-            .then(then)
-            .catch(err => {
-                console.log(err);
-            });
+        then(event.target.result);
     };
     reader.onerror = (event) => {
         console.log(error);
     };
 }
 
-function buttonPressed() {
+function loadFiles() {
     let files = document.getElementById("logInput").files;
     let messages = [];
     let finished = 0;
+    let fileProcessed = () => {
+        finished++;
+        if (finished === files.length) {
+            process(messages);
+        }
+    };
     for (let i in files) {
         let file = files[i];
         if (typeof(file) === "object") {
-            getMessagesFromFile(file, (messageList) => {
-                let chat = messageList[0].message.includes("WhatsApp") ? messageList[0].author : file.name;
-                messages = messages.concat(messageList.map((m) => {
-                    m.chat = chat;
-                    return m;
-                }));
-                finished++;
-                if (finished === files.length) {
-                    process(messages);
-                }
-            });
+            let extension = file.name.split(".").pop();
+            if (extension === "txt") {
+                readTextFromFile(file, (text) => {
+                    whatsappChatParser
+                        .parseString(event.target.result)
+                        .then((messageList) => {
+                            let chat = messageList[0].message.includes("WhatsApp") ? messageList[0].author : file.name;
+                            messages = messages.concat(messageList.map((m) => {
+                                m.chat = chat;
+                                return m;
+                            }));
+                            fileProcessed();
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
+                });
+            } else if (extension === "html") {
+                readTextFromFile(file, (text) => {
+                    let parser = new DOMParser();
+                    let html = parser.parseFromString(text, "text/html");
+                    let content = html.getElementsByClassName("content")[0].children;
+                    let chat = content[0].innerText.substring(2);
+                    let lastAuthor = "";
+                    let newMessages = [];
+                    let groupChat = false;
+                    if (content.length < 3) {
+                        fileProcessed();
+                    } else if (content[2].tagName.toUpperCase() === "P") {
+                        groupChat = true;
+                    }
+                    for (let i = 0; i < content.length; i++) {
+                        let element = content[i];
+                        if (element.tagName.toUpperCase() === "DIV") {
+                            let date = element.firstElementChild.firstElementChild.textContent.split(' ');
+                            let left = date[0].split('/');
+                            let right = date[1].split(':');
+                            let message = {
+                                date: new Date(parseInt(left[2]), parseInt(left[0]) - 1, parseInt(left[1]),
+                                                parseInt(right[0]), parseInt(right[1]), parseInt(right[2])),
+                                author: "You",
+                                message: element.children[1].firstElementChild.textContent
+                            };
+                            if (element.className === "triangle-lefttextgroundback") {
+                                let text = element.children[1];
+                                while (text.children.length > 0 && text.firstChild.nodeType != Node.TEXT_NODE && text.firstChild.tagName.toUpperCase() === "FONT") {
+                                    text = text.firstChild;
+                                }
+                                if (text.childNodes.length === 1) {
+                                    message.author = lastAuthor;
+                                    message.message = text.textContent;
+                                } else {
+                                    message.author = text.firstChild.textContent;
+                                    message.message = "";
+                                    for (let i = 2; i < text.childNodes.length; i++) {
+                                        message.message += text.childNodes[i].textContent;
+                                    }
+                                }
+                                if (!groupChat) {
+                                    message.author = chat;
+                                }
+                            } else if (element.className === "triangle-leftImageBackground") {
+                                // the amount of weird formatting in iTransor html is horrifying, hence the edge cases
+                                if (element.children[1].firstElementChild.firstElementChild === null) {
+                                    message.author = chat;
+                                } else {
+                                    message.author = element.children[1].firstElementChild.firstElementChild.textContent;
+                                }
+                                if (!groupChat) {
+                                    message.author = chat;
+                                }
+                            }
+                            if (message.author[message.author.length - 1] === ":") {
+                                message.author = message.author.slice(0, -1);
+                            }
+                            lastAuthor = message.author;
+                            message.chat = chat;
+                            newMessages.push(message);
+                        }
+                    }
+                    for (let i = newMessages.length - 1; i >= 0; i--) {
+                        let message = newMessages[i];
+                        if (message.author === ":") {
+                            if (i === newMessages.length - 1) {
+                                message.author = newMessages[i - 1].author;
+                            } else {
+                                message.author = newMessages[i + 1].author;
+                            }
+                        }
+                        if (message.author !== "") {
+                            messages.push(message);
+                        }
+                    }
+                    fileProcessed();
+                });
+            }
         }
     }
+}
+
+function buttonPressed() {
+    loadFiles();
 }
