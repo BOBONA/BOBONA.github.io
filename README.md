@@ -1,3 +1,2 @@
 # BOBONA.github.io
-Various utilities  
-This site stores different things that I need to be readily accessible online. Feel free to use anything that happens to be of use.
+This site is currently a directory of links relevant to me. At some point in time it will probably turn into more of a resume... 
