@@ -24,4 +24,4 @@ for (let i = 0; i < times.length - 1; i++) {
 }
 
 window.location.replace(`https://docs.google.com/forms/d/e/1FAIpQLScTZluOOu2J87HRLBj7FZ_zVqZpZQ8Az9YtEiUaEzlcI3tLjg/formResponse?&submit=Submit&` +
-    `entry.1667978196=${time}&entry.1552564986=${inOrOut}&entry.1607898137=${phone ? "Yes" : "No"}&entry.551232803=${apartment}&entry.1130957596=${name}`);
+    `entry.275193204=${time}&entry.1682337327=${inOrOut}&entry.2096638216=${phone ? "Yes" : "No"}&entry.115186426=${apartment}&entry.570713596=${name}`);
