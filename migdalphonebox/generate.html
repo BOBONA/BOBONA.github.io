@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Generate URL</title>
+        <script src="generate.js"></script>
+    </head>
+    <body>
+        <h1>Generate your Quick URL:</h1>
+        <label><input id="inOrOut" type="checkbox"></input>In or Out</label>
+        <div>Put Phone in for
+            <label><input id="shacharit" type="checkbox"></input>Shacharit</label>
+            <label><input id="morning" type="checkbox"></input>Morning Seder</label>
+            <label><input id="afternoon" type="checkbox"></input>Mincha & Afternoon Seder</label>
+            <label><input id="night" type="checkbox"></input>Night Seder & Arvit</label>
+        </div>
+        <input id="apartment" type="text" placeholder="Apartment"></input>
+        <input id="name" type="text" placeholder="Name (as on the form)"></input>
+        <br>
+        <button onclick="generate()">Generate</button>
+        <a id="link" target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLScTZluOOu2J87HRLBj7FZ_zVqZpZQ8Az9YtEiUaEzlcI3tLjg/viewform"><p>https://docs.google.com/forms/d/e/1FAIpQLScTZluOOu2J87HRLBj7FZ_zVqZpZQ8Az9YtEiUaEzlcI3tLjg/viewform</p></a>
+    </body>
+</html>
