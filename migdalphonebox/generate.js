@@ -1,19 +1,3 @@
-function iosCopyToClipboard(el) {
-    var oldContentEditable = el.contentEditable,
-        oldReadOnly = el.readOnly,
-        range = document.createRange();
-    el.contentEditable = true;
-    el.readOnly = false;
-    range.selectNodeContents(el);
-    var s = window.getSelection();
-    s.removeAllRanges();
-    s.addRange(range);
-    el.setSelectionRange(0, 999999);
-    el.contentEditable = oldContentEditable;
-    el.readOnly = oldReadOnly;
-    document.execCommand('copy');
-}
-
 function addData(label, text) {
     let l = document.createElement("p");
     l.textContent = label;

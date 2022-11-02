@@ -23,5 +23,14 @@ for (let i = 0; i < times.length - 1; i++) {
     }
 }
 
+const ids = {
+    "39": "570713596",
+    "49": "865593227",
+    "27": "2107477704",
+    "23": "1736851528",
+    "35": "237174216",
+    "14": "1319684264"
+}
+
 window.location.replace(`https://docs.google.com/forms/d/e/1FAIpQLScTZluOOu2J87HRLBj7FZ_zVqZpZQ8Az9YtEiUaEzlcI3tLjg/formResponse?&submit=Submit&` +
-    `entry.275193204=${time}&entry.1682337327=${inOrOut}&entry.2096638216=${phone ? "Yes" : "No"}&entry.115186426=${apartment}&entry.570713596=${name}`);
+    `entry.275193204=${time}&entry.1682337327=${inOrOut}&entry.2096638216=${phone ? "Yes" : "No"}&entry.115186426=${apartment}&entry.${ids[apartment]}=${name}`);
