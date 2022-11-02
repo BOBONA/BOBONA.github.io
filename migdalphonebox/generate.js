@@ -22,7 +22,7 @@ function generate() {
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
 
-    addData("Sign-in link (tap text to copy)", `https://bobona.github.io/migdalphonebox/submit.html` +
+    addData("Sign-in link (double tap text and copy all)", `https://bobona.github.io/migdalphonebox/submit.html` +
     `?where=IN&phones=${JSON.stringify([shacharit, morning, afternoon, night])}&apartment=${apartment}&name=${name}`);
     addData("Sign-out link", `https://bobona.github.io/migdalphonebox/submit.html` +
     `?where=OUT&phones=${JSON.stringify([shacharit, morning, afternoon, night])}&apartment=${apartment}&name=${name}`);
