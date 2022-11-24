@@ -41,12 +41,6 @@ function generate() {
     'use strict';
     let phones = [true, false, false, false];
     let email = "${email}";
-    const times = [
-        ["Shacharit", 7, 25],
-        ["Morning Seder", 8, 40],
-        ["Mincha & Afternoon Seder", 14, 55],
-        ["Night Seder & Arvit", 19, 10]
-    ];
     function xpath(path) {
         return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     }

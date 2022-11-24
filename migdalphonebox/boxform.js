@@ -1,6 +1,6 @@
 const times = [
     ["Shacharit", 7, 25],
-    ["Morning+Seder", 8, 40],
+    ["Morning+Seder", 8, 50],
     ["Mincha+%26+Afternoon Seder", 14, 55],
     ["Night+Seder+%26+Arvit", 19, 10]
 ];
