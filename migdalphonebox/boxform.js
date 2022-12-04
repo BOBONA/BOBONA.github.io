@@ -1,12 +1,25 @@
-const times = [
-    ["Shacharit", 7, 25],
-    ["Morning+Seder", 8, 50],
-    ["Mincha+%26+Afternoon Seder", 14, 55],
-    ["Night+Seder+%26+Arvit", 19, 10]
-];
+const times;
 
 const urlParams = new URLSearchParams(window.location.search);
 const inOrOut = urlParams.get("where");
+
+if (inOrOut == "IN"){
+    const times = [
+        ["Shacharit", 7, 00],
+        ["Morning+Seder", 8, 15],
+        ["Mincha+%26+Afternoon Seder", 13, 00],
+        ["Night+Seder+%26+Arvit", 18, 40]
+        ];
+}
+else {
+    const times = [
+    ["Shacharit", 7, 00],
+    ["Morning+Seder", 11, 30],
+    ["Mincha+%26+Afternoon Seder", 16, 00],
+    ["Night+Seder+%26+Arvit", 20, 20]
+];
+    }
+
 const phones = JSON.parse(urlParams.get("phones"));
 const apartment = urlParams.get("apartment");
 const name = urlParams.get("name");
