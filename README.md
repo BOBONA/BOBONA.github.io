@@ -1,4 +1,3 @@
 # BOBONA.github.io
-This site is currently a directory of links relevant to me. At some point in time it will probably turn into more of a resume... 
-
-It also hosts some static web utilities.
+This site holds the [landing page](https://github.com/BOBONA/Just-a-Sample-landing) for [Just a Sample](https://github.com/BOBONA/Just-a-Sample). 
+Eventually I will add a proper personal site. 
