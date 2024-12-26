@@ -38,8 +38,8 @@ Or view source directly</a></p> </div> </div> </div> </div> </div> </div> <scrip
 
     // Use placeholder image until video is loaded
 
-    const video = document.getElementById("video") as HTMLVideoElement;
-    const placeholder = document.getElementById("videoPlaceholder") as HTMLImageElement;
+    const video = document.getElementById("video");
+    const placeholder = document.getElementById("videoPlaceholder");
 
     function showVideo() {
       video.classList.remove("hidden");
@@ -94,7 +94,7 @@ Or view source directly</a></p> </div> </div> </div> </div> </div> </div> <scrip
       // Update section highlights
       const sections = ["powerful", "navigate", "beautiful", "free"];
       const currentSection = sections.toReversed().find(section => {
-        const el = document.getElementById(section) as HTMLElement;
+        const el = document.getElementById(section);
         return el.getBoundingClientRect().top < 0;
       });
 
